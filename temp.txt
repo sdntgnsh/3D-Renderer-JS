@@ -1,0 +1,105 @@
+.toggle-btn,
+#cars {
+  background-color: var(--black);
+  color: rgb(255, 255, 255);
+  border: none;
+  margin: auto;
+  padding: 5vh;
+  height: 5hv;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.canvas-container {
+  background-color: var(--grey);
+  padding: 3vh;
+  display: flex;
+  align-items: center;
+  /* padding: 5px solid #19647e; */
+}
+ul {
+  background-color: var(--grey);
+  padding: 1vh;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  /* padding: 5px solid #19647e; */
+}
+
+li {
+  /* margin: 10vh; */
+
+  margin-left: auto;
+  margin-right: auto;
+}
+.controls-container {
+  background-color: var(--grey);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 13vh;
+
+  /* padding: 5px solid #19647e; */
+}
+
+canvas {
+  border: 1px solid var(--main-color);
+  margin: auto;
+  height: 80vh;
+  width: 100%;
+  background-color: var(--black);
+  border-radius: 0.2em;
+}
+
+/* 020202-17bebb-19647e-f3ffb9-d741a7 */
+
+/* From Uiverse.io by adamgiebl */
+/* button,
+#cars {
+  /* font-size: 15px; */
+  padding: 3vh;
+  /* height: 54hv; */
+  width: 20vh;
+  letter-spacing: 0.06em;
+  position: relative;
+  font-family: inherit;
+  border-radius: 0.2em;
+  overflow: hidden;
+  transition: all 0.3s;
+  line-height: 1.4em;
+  margin: auto;
+  border: 2px solid var(--main-color);
+  background-color: var(--black);
+  color: var(--main-color);
+  box-shadow: inset 0 0 10px var(--start-gradient),
+    0 0 9px 3px var(--end-gradient);
+  min-width: 100px;
+}
+
+button:hover {
+  color: var(--after-hover);
+  box-shadow: inset 0 0 10px var(--start-gradient),
+    0 0 9px 3px var(--end-gradient);
+}
+
+button:before {
+  content: "";
+  position: absolute;
+  left: -4em;
+  width: 4em;
+  height: 100%;
+  top: 0;
+  transition: transform 0.4s ease-in-out;
+  background: linear-gradient(
+    to right,
+    transparent 1%,
+    var(--start-gradient) 40%,
+    var(--main-color) 60%,
+    transparent 100%
+  );
+}
+
+button:hover:before {
+  transform: translateX(15em);
+} */
