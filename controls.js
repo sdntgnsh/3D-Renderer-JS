@@ -3,7 +3,7 @@
   window.activeKeys = new Set();
 
   // Emit custom controlInput event with provided details.
-  // 'active' distinguishes between toggled on (true) and off (false) for toggle keys.
+  // The 'active' property indicates toggle status: true means on, false means off.
   function emitControlInput({ direction = null, key = null, active = true }) {
     document.dispatchEvent(
       new CustomEvent("controlInput", { detail: { direction, key, active } })
@@ -55,7 +55,6 @@
   function bindToggleButton(selector, keyCode, keyChar) {
     $(selector).on("pointerup", function (e) {
       e.preventDefault();
-      // Toggle the active state on pointerup.
       if ($(this).hasClass("active")) {
         // Toggle off: remove class and emit inactive event.
         $(this).removeClass("active");
@@ -145,10 +144,10 @@
       }
       // Handle toggle keys (Q, F, C) via keyboard.
       else if ([81, 70, 67].includes(keyCode)) {
-        // Only toggle if this is not an auto‐repeat.
-        if (e.repeat) return;
+        // Prevent browser from handling these keys in its default way.
+        e.preventDefault();
+        if (e.repeat) return; // Ignore auto-repeat for toggles.
 
-        // Determine selector and keyChar for the toggle.
         let selector, keyChar;
         switch (keyCode) {
           case 81:
@@ -164,7 +163,7 @@
             keyChar = "C";
             break;
         }
-        // Toggle behavior: add active if not active, remove if active.
+        // Toggle behavior: if not active, activate; if active, deactivate.
         if (!$(selector).hasClass("active")) {
           $(selector).addClass("active");
           emitControlInput({ key: keyChar, active: true });
@@ -176,7 +175,7 @@
     })
     .on("keyup", function (e) {
       const keyCode = e.which;
-      // For momentary keys, remove the key on keyup.
+      // Handle momentary keys: remove on keyup.
       if ([37, 38, 39, 40, 65, 66].includes(keyCode)) {
         window.activeKeys.delete(keyCode);
         switch (keyCode) {
@@ -216,9 +215,9 @@
             break;
         }
       }
-      // Do not remove toggle key active classes on keyup.
+      // Toggle keys: we keep their active state until toggled again via keydown.
     });
-})(); 
+})();
 
 // Konami code with UI feedback
 var Konami = function (callback) {
