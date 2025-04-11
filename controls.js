@@ -70,7 +70,57 @@ $(document).keyup(function (e) {
     case 66:
       $(".b").text("");
       break;
+
+    case 81: // Q
+      $(".shape-btn").removeClass("active");
+      break;
+    case 70: // F
+      $(".wireframe-btn").removeClass("active");
+      break;
+    case 67: // C
+      $(".color-btn").removeClass("active");
+      break;
   }
+});
+
+// Handle button clicks
+$(".shape-btn").on("click", () => {
+  emitControlInput({ key: "Q" });
+});
+
+$(".wireframe-btn").on("click", () => {
+  emitControlInput({ key: "F" });
+});
+
+$(".color-btn").on("click", () => {
+  emitControlInput({ key: "C" });
+});
+
+$("#shape-list").on("change", (e) => {
+  const shape = e.target.value;
+  emitControlInput({ key: shape.toUpperCase() }); // Example: "CUBE"
+});
+
+// Handle key presses (Q, F, C)
+$(document).keydown(function (e) {
+  let key = null;
+
+  switch (e.which) {
+    case 81: // Q
+      key = "Q";
+      $(".shape-btn").addClass("active");
+      break;
+    case 70: // F
+      key = "F";
+      $(".wireframe-btn").addClass("active");
+      break;
+    case 67: // C
+      key = "C";
+      $(".color-btn").addClass("active");
+      break;
+  }
+
+  if (key) emitControlInput({ key });
 });
 
 // Konami code with UI feedback

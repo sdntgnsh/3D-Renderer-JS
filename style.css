@@ -172,6 +172,12 @@ button,
   box-shadow: 0 0 0 var(--😀😀😀);
 }
 
+.button.active {
+  letter-spacing: 0px;
+  transform: skew(0deg) translateY(8px);
+  box-shadow: 0 0 0 var(--😀😀😀);
+}
+
 @media (max-width: 800px) {
   .button,
   #shape-list {
@@ -251,11 +257,12 @@ html {
   cursor: pointer;
   width: 75px;
   height: 75px;
-  text-align: center;
-  line-height: 75px;
-  background: var(--arrow-clr);
   color: white;
-  font-size: 30px;
+  font-size: 40px;
+  text-align: center;
+  vertical-align: middle;
+
+  background: var(--arrow-clr);
 
   border-right: 10px solid var(--arrow-clr-dark-20);
   border-bottom: 10px solid var(--arrow-clr-dark-20);
@@ -382,10 +389,10 @@ html {
 @media (max-width: 800px) {
   .arrows-container {
     margin: auto;
-    height: 200px;
-    width: 200px;
+    height: 75px;
+    width: 225px;
     min-height: 200px;
-    min-width: 200px;
+    min-width: 225px;
   }
 
   /* @media (max-width: 800px) {
@@ -400,8 +407,10 @@ html {
   } */
 
   .arrows-container {
-    display: inline-block;
+    display: flex;
     align-items: center;
+    justify-content: center;
+    flex-direction: column;
   }
   @import url(https://fonts.googleapis.com/css?family=Lato:300);
 
@@ -414,29 +423,30 @@ html {
 
   .keys {
     font-family: "Lato", sans-serif;
-    font-size: 100;
+    font-size: 25px;
     text-align: center;
-    width: 200px;
-    height: 50px;
+    width: 100%;
+    height: 100%;
     margin: auto;
   }
 
   .arr {
     cursor: pointer;
-    width: 33px;
-    height: 33px;
+    width: 50px;
+    height: 50px;
     text-align: center;
-    line-height: 33px;
+
+    line-height: 25px;
     background: var(--arrow-clr);
     color: white;
-    font-size: 20px;
+    font-size: 30px;
 
     border-right: 10px solid var(--arrow-clr-dark-20);
     border-bottom: 10px solid var(--arrow-clr-dark-20);
     border-left: 10px solid var(--arrow-clr-dark-15);
     border-top: 10px solid var(--arrow-clr-dark-10);
     display: inline-block;
-    margin: 4px;
+    margin: 0px;
     transition: all 0.05s linear;
     &:active {
       border-bottom: 8px solid var(--arrow-clr-dark-20);
@@ -468,7 +478,7 @@ html {
   .b {
     color: blue;
     text-shadow: 0 0 10px blue, 0 0 10px blue, 0 0 10px blue, 0 0 10px blue;
-    font-size: 100px;
+    font-size: 25px;
     font-family: serif;
   }
 
@@ -476,7 +486,7 @@ html {
     color: yellow;
     text-shadow: 0 0 10px yellow, 0 0 10px yellow, 0 0 10px yellow,
       0 0 10px yellow;
-    font-size: 100px;
+    font-size: 25px;
     font-family: serif;
   }
 }
