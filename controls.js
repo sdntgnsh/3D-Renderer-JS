@@ -1,58 +1,16 @@
-// controls.js
 (function () {
-  // Global active keys set
+  // Global active keys set for momentary keys (arrow keys, A, B)
   window.activeKeys = new Set();
 
-  // Dispatch a custom controlInput event
-  function emitControlInput({ direction = null, key = null }) {
+  // Emit a custom controlInput event with given details
+  function emitControlInput({ direction = null, key = null, active = true }) {
     document.dispatchEvent(
-      new CustomEvent("controlInput", { detail: { direction, key } })
+      new CustomEvent("controlInput", { detail: { direction, key, active } })
     );
   }
+  window.emitControlInput = emitControlInput;
 
-  // Helper to add mouse event handlers for a button that represents a key control
-  function addMouseKeyHandlers(selector, keyCode) {
-    $(selector).on("mousedown", () => {
-      window.activeKeys.add(keyCode);
-      emitKeyChange();
-    });
-    $(selector).on("mouseup mouseleave", () => {
-      window.activeKeys.delete(keyCode);
-    });
-  }
-
-  // Add mouse events for arrow controls
-  addMouseKeyHandlers(".up", 38);
-  addMouseKeyHandlers(".down", 40);
-  addMouseKeyHandlers(".left", 37);
-  addMouseKeyHandlers(".right", 39);
-
-  // Optional control button click handlers for keys Q, F, C.
-  // These could represent shape, wireframe, and color controls.
-  $(".shape-btn").on("click", () => {
-    emitControlInput({ key: "Q" });
-    window.activeKeys.add(81);
-    emitKeyChange();
-  });
-  $(".wireframe-btn").on("click", () => {
-    emitControlInput({ key: "F" });
-    window.activeKeys.add(70);
-    emitKeyChange();
-  });
-  $(".color-btn").on("click", () => {
-    emitControlInput({ key: "C" });
-    window.activeKeys.add(67);
-    emitKeyChange();
-  });
-
-  // If using a select list for shape changes, handle that change here
-  $("#shape-list").on("change", (e) => {
-    const shape = e.target.value;
-    emitControlInput({ key: shape.toUpperCase() }); // e.g. "CUBE"
-  });
-
-  // Update all keys in the activeKeys set.
-  // This iterates through currently held keys and emits a controlInput event for each.
+  // For momentary keys (arrows, A, B), this emits control events.
   function emitKeyChange() {
     window.activeKeys.forEach((code) => {
       let detail = {};
@@ -75,15 +33,6 @@
         case 66:
           detail.key = "B";
           break;
-        case 81:
-          detail.key = "Q";
-          break;
-        case 70:
-          detail.key = "F";
-          break;
-        case 67:
-          detail.key = "C";
-          break;
       }
       if (detail.direction || detail.key) {
         emitControlInput(detail);
@@ -91,117 +40,213 @@
     });
   }
 
-  // Handle keyboard events on the document
+  // -----------------------------------------------------------
+  // Arrow keys: use pointer events for immediate, momentary activation.
+  function addPointerKeyHandlers(selector, keyCode, directionName) {
+    const activate = (e) => {
+      e.preventDefault();
+      if (!window.activeKeys.has(keyCode)) {
+        window.activeKeys.add(keyCode);
+        // Emit the arrow key control immediately
+        emitControlInput({
+          direction: directionName.toUpperCase(),
+          active: true,
+        });
+      }
+      $(selector).addClass("pressed").css("transform", "translate(0, 2px)");
+      $(`.${directionName}text`).text(directionName.toUpperCase());
+    };
+
+    const deactivate = (e) => {
+      e.preventDefault();
+      window.activeKeys.delete(keyCode);
+      emitControlInput({
+        direction: directionName.toUpperCase(),
+        active: false,
+      });
+      $(selector).removeClass("pressed").css("transform", "translate(0, 0)");
+      $(`.${directionName}text`).text("");
+    };
+
+    $(selector)
+      .on("pointerdown", activate)
+      .on("pointerup pointerleave", deactivate);
+  }
+
+  // Bind arrow key buttons
+  addPointerKeyHandlers(".up", 38, "up");
+  addPointerKeyHandlers(".down", 40, "down");
+  addPointerKeyHandlers(".left", 37, "left");
+  addPointerKeyHandlers(".right", 39, "right");
+
+  // -----------------------------------------------------------
+  // Toggle buttons for Q, F, and C: using pointerup event to toggle on a single click/tap.
+  function bindToggleButton(selector, keyCode, keyChar) {
+    $(selector).on("pointerup", function (e) {
+      e.preventDefault();
+      // Toggle the active class immediately on pointerup.
+      if ($(this).hasClass("active")) {
+        // Toggling off
+        $(this).removeClass("active");
+        // Emit control input for toggle deactivation
+        emitControlInput({ key: keyChar, active: false });
+      } else {
+        // Toggling on
+        $(this).addClass("active");
+        emitControlInput({ key: keyChar, active: true });
+      }
+    });
+  }
+
+  // Bind control (toggle) buttons: Shape (Q), Wireframe (F), and Color (C)
+  bindToggleButton(".shape-btn", 81, "Q");
+  bindToggleButton(".wireframe-btn", 70, "F");
+  bindToggleButton(".color-btn", 67, "C");
+
+  // -----------------------------------------------------------
+  // Shape selector dropdown change
+  $("#shape-list").on("change", (e) => {
+    const shape = e.target.value;
+    emitControlInput({ key: shape.toUpperCase() });
+  });
+
+  // -----------------------------------------------------------
+  // Keyboard support
   $(document)
     .on("keydown", function (e) {
       const keyCode = e.which;
-      // If this key isn't already active, add it and emit an update.
-      if (!window.activeKeys.has(keyCode)) {
-        window.activeKeys.add(keyCode);
-        emitKeyChange();
-      }
-      // Visual feedback for specific keys
-      switch (keyCode) {
-        case 37:
-          $(".left").addClass("pressed").css("transform", "translate(0, 2px)");
-          $(".lefttext").text("LEFT");
-          break;
-        case 38:
-          $(".up").addClass("pressed").css("transform", "translate(0, 2px)");
-          $(".uptext").text("UP");
-          break;
-        case 39:
-          $(".right").addClass("pressed").css("transform", "translate(0, 2px)");
-          $(".righttext").text("RIGHT");
-          break;
-        case 40:
-          $(".down").addClass("pressed").css("transform", "translate(0, 2px)");
-          $(".downtext").text("DOWN");
-          break;
-        case 65:
-          $(".a").text("A");
-          break;
-        case 66:
-          $(".b").text("B");
-          break;
-        case 81:
-          $(".shape-btn").addClass("active");
-          break;
-        case 70:
-          $(".wireframe-btn").addClass("active");
-          break;
-        case 67:
-          $(".color-btn").addClass("active");
-          break;
-      }
 
-      // Optionally, for arrow keys and certain letters, emit controlInput immediately.
+      // Momentary keys (arrow keys, A, B)
       if ([37, 38, 39, 40, 65, 66].includes(keyCode)) {
-        let detail = {};
+        if (!window.activeKeys.has(keyCode)) {
+          window.activeKeys.add(keyCode);
+          switch (keyCode) {
+            case 37:
+              emitControlInput({ direction: "LEFT", active: true });
+              break;
+            case 38:
+              emitControlInput({ direction: "UP", active: true });
+              break;
+            case 39:
+              emitControlInput({ direction: "RIGHT", active: true });
+              break;
+            case 40:
+              emitControlInput({ direction: "DOWN", active: true });
+              break;
+            case 65:
+              emitControlInput({ key: "A", active: true });
+              break;
+            case 66:
+              emitControlInput({ key: "B", active: true });
+              break;
+          }
+        }
+        // Visual feedback for momentary keys
         switch (keyCode) {
           case 37:
-            detail.direction = "LEFT";
+            $(".left")
+              .addClass("pressed")
+              .css("transform", "translate(0, 2px)");
+            $(".lefttext").text("LEFT");
             break;
           case 38:
-            detail.direction = "UP";
+            $(".up").addClass("pressed").css("transform", "translate(0, 2px)");
+            $(".uptext").text("UP");
             break;
           case 39:
-            detail.direction = "RIGHT";
+            $(".right")
+              .addClass("pressed")
+              .css("transform", "translate(0, 2px)");
+            $(".righttext").text("RIGHT");
             break;
           case 40:
-            detail.direction = "DOWN";
+            $(".down")
+              .addClass("pressed")
+              .css("transform", "translate(0, 2px)");
+            $(".downtext").text("DOWN");
             break;
           case 65:
-            detail.key = "A";
+            $(".a").text("A");
             break;
           case 66:
-            detail.key = "B";
+            $(".b").text("B");
             break;
         }
-        if (detail.direction || detail.key) {
-          emitControlInput(detail);
+      }
+      // Toggle keys (Q, F, C) from keyboard:
+      else if ([81, 70, 67].includes(keyCode)) {
+        switch (keyCode) {
+          case 81:
+            $(".shape-btn").addClass("active");
+            emitControlInput({ key: "Q", active: true });
+            break;
+          case 70:
+            $(".wireframe-btn").addClass("active");
+            emitControlInput({ key: "F", active: true });
+            break;
+          case 67:
+            $(".color-btn").addClass("active");
+            emitControlInput({ key: "C", active: true });
+            break;
         }
       }
     })
     .on("keyup", function (e) {
       const keyCode = e.which;
-      // Remove key from the active set on keyup.
-      window.activeKeys.delete(keyCode);
-      // Remove visual feedback.
-      switch (keyCode) {
-        case 37:
-          $(".left").removeClass("pressed").css("transform", "translate(0, 0)");
-          $(".lefttext").text("");
-          break;
-        case 38:
-          $(".up").removeClass("pressed").css("transform", "translate(0, 0)");
-          $(".uptext").text("");
-          break;
-        case 39:
-          $(".right")
-            .removeClass("pressed")
-            .css("transform", "translate(0, 0)");
-          $(".righttext").text("");
-          break;
-        case 40:
-          $(".down").removeClass("pressed").css("transform", "translate(0, 0)");
-          $(".downtext").text("");
-          break;
-        case 65:
-          $(".a").text("");
-          break;
-        case 66:
-          $(".b").text("");
-          break;
-        case 81:
-          $(".shape-btn").removeClass("active");
-          break;
-        case 70:
-          $(".wireframe-btn").removeClass("active");
-          break;
-        case 67:
-          $(".color-btn").removeClass("active");
-          break;
+      if ([37, 38, 39, 40, 65, 66].includes(keyCode)) {
+        window.activeKeys.delete(keyCode);
+        switch (keyCode) {
+          case 37:
+            $(".left")
+              .removeClass("pressed")
+              .css("transform", "translate(0, 0)");
+            $(".lefttext").text("");
+            emitControlInput({ direction: "LEFT", active: false });
+            break;
+          case 38:
+            $(".up").removeClass("pressed").css("transform", "translate(0, 0)");
+            $(".uptext").text("");
+            emitControlInput({ direction: "UP", active: false });
+            break;
+          case 39:
+            $(".right")
+              .removeClass("pressed")
+              .css("transform", "translate(0, 0)");
+            $(".righttext").text("");
+            emitControlInput({ direction: "RIGHT", active: false });
+            break;
+          case 40:
+            $(".down")
+              .removeClass("pressed")
+              .css("transform", "translate(0, 0)");
+            $(".downtext").text("");
+            emitControlInput({ direction: "DOWN", active: false });
+            break;
+          case 65:
+            $(".a").text("");
+            emitControlInput({ key: "A", active: false });
+            break;
+          case 66:
+            $(".b").text("");
+            emitControlInput({ key: "B", active: false });
+            break;
+        }
+      } else if ([81, 70, 67].includes(keyCode)) {
+        // For keyboard toggle keys: remove the active class on keyup.
+        switch (keyCode) {
+          case 81:
+            $(".shape-btn").removeClass("active");
+            emitControlInput({ key: "Q", active: false });
+            break;
+          case 70:
+            $(".wireframe-btn").removeClass("active");
+            emitControlInput({ key: "F", active: false });
+            break;
+          case 67:
+            $(".color-btn").removeClass("active");
+            emitControlInput({ key: "C", active: false });
+            break;
+        }
       }
     });
 })();
@@ -226,6 +271,8 @@ var Konami = function (callback) {
   };
   konami.load(callback);
 };
+
+window.emitControlInput = emitControlInput;
 
 new Konami(function () {
   alert("Colors mode activated (Press A when you close this)!");
