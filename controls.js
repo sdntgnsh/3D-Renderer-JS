@@ -1,5 +1,5 @@
 // controls.js
-
+window.activeKeys = new Set();
 function emitControlInput({ direction = null, key = null }) {
   document.dispatchEvent(
     new CustomEvent("controlInput", {
@@ -8,10 +8,91 @@ function emitControlInput({ direction = null, key = null }) {
   );
 }
 
+$(".up").on("mousedown", () => {
+  window.activeKeys.add(38);
+  emitKeyChange();
+});
+$(".up").on("mouseup mouseleave", () => {
+  window.activeKeys.delete(38);
+});
+
+$(".down").on("mousedown", () => {
+  window.activeKeys.add(40);
+  emitKeyChange();
+});
+$(".down").on("mouseup mouseleave", () => {
+  window.activeKeys.delete(40);
+});
+
+$(".left").on("mousedown", () => {
+  window.activeKeys.add(37);
+  emitKeyChange();
+});
+$(".left").on("mouseup mouseleave", () => {
+  window.activeKeys.delete(37);
+});
+
+$(".right").on("mousedown", () => {
+  window.activeKeys.add(39);
+  emitKeyChange();
+});
+$(".right").on("mouseup mouseleave", () => {
+  window.activeKeys.delete(39);
+});
+
+function emitKeyChange() {
+  for (const code of activeKeys) {
+    let direction = null;
+    let key = null;
+
+    switch (code) {
+      case 37:
+        direction = "LEFT";
+        break;
+      case 38:
+        direction = "UP";
+        break;
+      case 39:
+        direction = "RIGHT";
+        break;
+      case 40:
+        direction = "DOWN";
+        break;
+      case 65:
+        key = "A";
+        break;
+      case 66:
+        key = "B";
+        break;
+      case 81:
+        key = "Q";
+        break;
+      case 70:
+        key = "F";
+        break;
+      case 67:
+        key = "C";
+        break;
+    }
+
+    if (direction || key) {
+      document.dispatchEvent(
+        new CustomEvent("controlInput", {
+          detail: { direction, key },
+        })
+      );
+    }
+  }
+}
+
 $(document).keydown(function (e) {
   let direction = null;
   let key = null;
-
+  const keyCode = e.which;
+  if (!activeKeys.has(keyCode)) {
+    activeKeys.add(keyCode);
+    emitKeyChange(); // emit once when new key is pressed
+  }
   switch (e.which) {
     case 37:
       direction = "LEFT";
@@ -47,6 +128,7 @@ $(document).keydown(function (e) {
 });
 
 $(document).keyup(function (e) {
+  activeKeys.delete(e.which);
   switch (e.which) {
     case 37:
       $(".left").removeClass("pressed").css("transform", "translate(0, 0)");

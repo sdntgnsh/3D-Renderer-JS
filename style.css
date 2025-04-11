@@ -69,7 +69,7 @@ ul {
   /* padding: 5px solid #19647e; */
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1500px) {
   .canvas-container {
     padding-right: 2vh;
 
@@ -90,6 +90,7 @@ ul {
 .bottom-container {
   background-image: url("static/dragon.jpg");
   display: flex;
+  min-width: 300px;
   flex-direction: column;
   align-items: center;
   justify-content: top;
@@ -97,7 +98,7 @@ ul {
   background-color: var(--blue);
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1500px) {
   .bottom-container {
     flex-direction: row;
     /* align-items: center; */
@@ -109,12 +110,12 @@ ul {
   flex-direction: row;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1500px) {
   .container {
     flex-direction: column;
   }
 }
-@media (max-width: 800px) {
+@media (max-width: 1500px) {
   .controls-container {
     padding-top: 20px;
     padding-bottom: 20px;
@@ -124,7 +125,7 @@ ul {
     justify-items: center;
   }
 }
-
+/* 
 canvas {
   border: 1px solid var(--main-color);
   margin: auto;
@@ -133,11 +134,29 @@ canvas {
   transform: skew(deg);
   background-color: var(--canvas);
   border-radius: 0.2em;
-}
+} */
 
-@media (max-width: 800px) {
-  canvas {
-    height: 65vh;
+.cc {
+  border: 1px solid var(--main-color);
+  /* margin: auto; */
+  height: 95.7vh;
+  width: 79vw;
+  transform: skew(deg);
+  background-color: var(--canvas);
+  border-radius: 0.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width: 1500px) {
+  .cc {
+    border: 1px solid var(--main-color);
+    /* margin: auto; */
+    height: 63vh;
+    width: 92svw;
+    transform: skew(deg);
+    background-color: var(--canvas);
+    border-radius: 0.2em;
   }
 }
 /* BUTTON CSS */
@@ -178,7 +197,7 @@ button,
   box-shadow: 0 0 0 var(--😀😀😀);
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1500px) {
   .button,
   #shape-list {
     margin-left: 5px;
@@ -221,7 +240,7 @@ button,
   min-width: 350px;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1500px) {
   .arrows-container {
     margin: auto;
     height: 250px;
@@ -313,7 +332,7 @@ html {
   font-family: serif;
 }
 /* 
-@media (max-width: 800px) {
+@media (max-width: 1500px) {
   html {
     background: radial-gradient(#000, #111);
     height: 100%;
@@ -386,16 +405,16 @@ html {
   }
 } */
 
-@media (max-width: 800px) {
+@media (max-width: 1500px) {
   .arrows-container {
     margin: auto;
     height: 75px;
-    width: 225px;
+    width: 215px;
     min-height: 200px;
-    min-width: 225px;
+    min-width: 215px;
   }
 
-  /* @media (max-width: 800px) {
+  /* @media (max-width: 1500px) {
     .arrows-container {
       margin: auto;
       height: 200px;
@@ -441,10 +460,10 @@ html {
     color: white;
     font-size: 30px;
 
-    border-right: 10px solid var(--arrow-clr-dark-20);
-    border-bottom: 10px solid var(--arrow-clr-dark-20);
-    border-left: 10px solid var(--arrow-clr-dark-15);
-    border-top: 10px solid var(--arrow-clr-dark-10);
+    border-right: 7px solid var(--arrow-clr-dark-20);
+    border-bottom: 7px solid var(--arrow-clr-dark-20);
+    border-left: 7px solid var(--arrow-clr-dark-15);
+    border-top: 7px solid var(--arrow-clr-dark-10);
     display: inline-block;
     margin: 0px;
     transition: all 0.05s linear;
