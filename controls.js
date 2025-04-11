@@ -1,6 +1,8 @@
 (function () {
   // Global active keys set for momentary keys (arrow keys, A, B)
   window.activeKeys = new Set();
+  // State for toggle keys to track when a key is held down
+  const toggleKeysDown = {};
 
   // Emit custom controlInput event with provided details.
   // The 'active' property indicates toggle status: true means on, false means off.
@@ -12,7 +14,7 @@
   window.emitControlInput = emitControlInput;
 
   // -----------------------------------------------------------
-  // Arrow keys (and A, B) are momentary keys handled separately.
+  // Momentary keys: arrow keys and A, B handled via pointer and keyboard.
   function addPointerKeyHandlers(selector, keyCode, directionName) {
     const activate = (e) => {
       e.preventDefault();
@@ -51,16 +53,14 @@
 
   // -----------------------------------------------------------
   // Toggle buttons for control keys (Q, F, C) via pointer.
-  // They toggle on pointerup.
   function bindToggleButton(selector, keyCode, keyChar) {
     $(selector).on("pointerup", function (e) {
       e.preventDefault();
+      // Toggle the button state
       if ($(this).hasClass("active")) {
-        // Toggle off: remove class and emit inactive event.
         $(this).removeClass("active");
         emitControlInput({ key: keyChar, active: false });
       } else {
-        // Toggle on: add class and emit active event.
         $(this).addClass("active");
         emitControlInput({ key: keyChar, active: true });
       }
@@ -144,38 +144,41 @@
       }
       // Handle toggle keys (Q, F, C) via keyboard.
       else if ([81, 70, 67].includes(keyCode)) {
-        // Prevent browser from handling these keys in its default way.
+        // Prevent default to capture key (such as F) properly.
         e.preventDefault();
-        if (e.repeat) return; // Ignore auto-repeat for toggles.
+        // Use our own toggleKey state to prevent repeated toggles while held down.
+        if (!toggleKeysDown[keyCode]) {
+          toggleKeysDown[keyCode] = true; // mark key as down
 
-        let selector, keyChar;
-        switch (keyCode) {
-          case 81:
-            selector = ".shape-btn";
-            keyChar = "Q";
-            break;
-          case 70:
-            selector = ".wireframe-btn";
-            keyChar = "F";
-            break;
-          case 67:
-            selector = ".color-btn";
-            keyChar = "C";
-            break;
-        }
-        // Toggle behavior: if not active, activate; if active, deactivate.
-        if (!$(selector).hasClass("active")) {
-          $(selector).addClass("active");
-          emitControlInput({ key: keyChar, active: true });
-        } else {
-          $(selector).removeClass("active");
-          emitControlInput({ key: keyChar, active: false });
+          let selector, keyChar;
+          switch (keyCode) {
+            case 81:
+              selector = ".shape-btn";
+              keyChar = "Q";
+              break;
+            case 70:
+              selector = ".wireframe-btn";
+              keyChar = "F";
+              break;
+            case 67:
+              selector = ".color-btn";
+              keyChar = "C";
+              break;
+          }
+          // Toggle the button state: if not active, activate; if active, deactivate.
+          if (!$(selector).hasClass("active")) {
+            $(selector).addClass("active");
+            emitControlInput({ key: keyChar, active: true });
+          } else {
+            $(selector).removeClass("active");
+            emitControlInput({ key: keyChar, active: false });
+          }
         }
       }
     })
     .on("keyup", function (e) {
       const keyCode = e.which;
-      // Handle momentary keys: remove on keyup.
+      // For momentary keys: remove key from active set and clear visual feedback.
       if ([37, 38, 39, 40, 65, 66].includes(keyCode)) {
         window.activeKeys.delete(keyCode);
         switch (keyCode) {
@@ -215,7 +218,10 @@
             break;
         }
       }
-      // Toggle keys: we keep their active state until toggled again via keydown.
+      // Clear toggle key state on keyup so subsequent keydowns will register
+      if ([81, 70, 67].includes(keyCode)) {
+        toggleKeysDown[keyCode] = false;
+      }
     });
 })();
 
