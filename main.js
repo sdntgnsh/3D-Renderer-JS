@@ -6,14 +6,29 @@ import { renderSolidPolygons } from "./rasterization.js";
 // import { Rasterizer } from "./rasterization.js";
 import {Color} from "./color.js";
 let ct = 0;
-let wireframe_tog = true;
+
 
 window.totalRotationAngleXZ = 0.0;
 window.totalRotationAngleXY = 0.0;
 const speed = 1;
 
 
+let wireframe_tog = true;
+let canToggleWireframe = true;
 
+const wireframeCooldown = 200; // milliseconds
+
+function toggleWireframe() {
+  if (!canToggleWireframe) return;
+
+  wireframe_tog = !wireframe_tog;
+  canToggleWireframe = false;
+
+  // Re-enable toggling after cooldown
+  setTimeout(() => {
+    canToggleWireframe = true;
+  }, wireframeCooldown);
+}
 // === Input Event Listener from controls.js ===
 document.addEventListener("controlInput", (e) => {
   const direction = e.detail?.direction;
@@ -49,7 +64,7 @@ document.addEventListener("controlInput", (e) => {
       break;
     case "F":
       // console.log("Wireframe mode toggled");
-      wireframe_tog = !wireframe_tog;
+      toggleWireframe();
       break;
     case "C":
       // console.log("Color change triggered");
