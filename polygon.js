@@ -1,5 +1,5 @@
 import { Vertex } from "./vertex.js";
-
+import { Color } from "./color.js";
 export class Polygon {
   vertex_arr = [];
   color;
@@ -19,7 +19,7 @@ export class Polygon {
     }
 
     this.vertex_arr = vertex_arr;
-    this.color = color;
+    this.color = new Color(color.r, color.g, color.b, color.a);
     this.sides = vertex_arr.length;
   }
 }
