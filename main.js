@@ -134,7 +134,7 @@ window.addEventListener("resize", () => {
 
 let lastTime = performance.now();
 function drawFrame(currentTime) {
-  updatePauseButton();
+  // updatePauseButton();
   // Clear the canvas to remove afterimages
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
@@ -161,8 +161,8 @@ function drawFrame(currentTime) {
   
 
   if(!window.isPaused && !autoRotationPaused){
-    totalRotationAngleXY += speed * 0.3;
-    totalRotationAngleXZ += speed * 0.3;
+    totalRotationAngleXY += speed * 0.1;
+    totalRotationAngleXZ += speed * 0.15;
   }
   
   // Normalize angles to prevent numeric overflow

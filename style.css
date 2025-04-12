@@ -161,7 +161,6 @@ ul {
   align-items: center;
   justify-content: top;
   background-color: var(--black);
-  background-color: var(--blue);
 }
 
 @media (max-width: 1500px) {
