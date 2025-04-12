@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -28,13 +29,43 @@
         </select>
         <button type="button" class="button color-btn">color(c)</button>
       </div>
-      <div class="arrows-container">
-        <div class="keys">
-          <div class="up arr"><i class="fa fa-arrow-up"></i></div>
-          <br />
-          <div class="left arr"><i class="fa fa-arrow-left"></i></div>
-          <div class="down arr"><i class="fa fa-arrow-down"></i></div>
-          <div class="right arr"><i class="fa fa-arrow-right"></i></div>
+      <div class="arrow-social-container">
+        <div class="arrows-container">
+          <div class="keys">
+            <div class="pause-toggle arr fa red">
+              <ion-icon class="ion" name="pause"></ion-icon>
+            </div>
+            <div class="up arr"><i class="fa fa-arrow-up"></i></div>
+            <div class="blank arr" title="Reserved"></div>
+            <br />
+            <div class="left arr"><i class="fa fa-arrow-left"></i></div>
+            <div class="down arr"><i class="fa fa-arrow-down"></i></div>
+            <div class="right arr"><i class="fa fa-arrow-right"></i></div>
+          </div>
+        </div>
+        <div class="social-container">
+          <div class="social-icons-btn">
+            <a
+              class="icons github"
+              href="https://github.com/sdntgnsh/3D-Renderer-JS"
+              target="_blank"
+            >
+              <ion-icon name="logo-github"></ion-icon>
+            </a>
+            <a
+              class="icons mail-outline"
+              href="mailto:siddhantganesh25@gmail.com"
+            >
+              <ion-icon name="mail-outline"></ion-icon>
+            </a>
+            <a
+              class="icons linkedin"
+              href="https://www.linkedin.com/in/siddhant-ganesh/"
+              target="_blank"
+            >
+              <ion-icon name="logo-linkedin"></ion-icon>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -42,4 +73,12 @@
 
   <script type="module" src="controls.js"></script>
   <script type="module" src="main.js"></script>
+  <script
+    type="module"
+    src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+  ></script>
+  <script
+    nomodule
+    src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+  ></script>
 </body>

@@ -10,7 +10,7 @@ let ct = 0;
 
 window.totalRotationAngleXZ = 0.0;
 window.totalRotationAngleXY = 0.0;
-const speed = 1;
+const speed = 2;
 
 
 let wireframe_tog = true;
@@ -60,7 +60,7 @@ document.addEventListener("controlInput", (e) => {
       break;
 
     case "Q":
-      // console.log("Shape mode triggered");
+      console.log("Shape mode triggered");
       break;
     case "F":
       // console.log("Wireframe mode toggled");
@@ -80,10 +80,43 @@ document.addEventListener("controlInput", (e) => {
   }
 });
 
+
+  function updatePauseButton() {
+    const $btn = $(".pause-toggle");
+    const $icon = $btn.find("ion-icon");
+
+    if (window.isPaused) {
+      $btn.addClass("green").removeClass("red");
+      $icon.attr("name", "play");
+    } else {
+      $btn.addClass("red").removeClass("green");
+      $icon.attr("name", "pause");
+    }
+  }
 // === Vertex Class ===
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
+
+
+let autoRotationPaused = false;
+let autoRotationTimeout;
+
+function pauseAutoRotationTemporarily(delay = 1000) {
+  window.isPaused = true;
+  console.log("Auto-rotation paused");
+  autoRotationPaused = true;
+
+  if (autoRotationTimeout) {
+    clearTimeout(autoRotationTimeout);
+  }
+
+  autoRotationTimeout = setTimeout(() => {
+    autoRotationPaused = false;
+    window.isPaused = false; // ← move it here
+    console.log("Auto-rotation resumed");
+  }, delay);
+}
 
 
 window.addEventListener("resize", resizeCanvas);
@@ -101,6 +134,7 @@ window.addEventListener("resize", () => {
 
 let lastTime = performance.now();
 function drawFrame(currentTime) {
+  updatePauseButton();
   // Clear the canvas to remove afterimages
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
@@ -109,10 +143,27 @@ function drawFrame(currentTime) {
   lastTime = currentTime;
   
   // Handle keyboard input
-  if (window.activeKeys.has(38)) totalRotationAngleXY += speed * 1; // UP
-  if (window.activeKeys.has(40)) totalRotationAngleXY -= speed * 1; // DOWN
-  if (window.activeKeys.has(37)) totalRotationAngleXZ -= speed * 1; // LEFT
-  if (window.activeKeys.has(39)) totalRotationAngleXZ += speed * 1; // RIGHT
+
+  const hasInput = window.activeKeys.has(38) || // UP
+                 window.activeKeys.has(40) || // DOWN
+                 window.activeKeys.has(37) || // LEFT
+                 window.activeKeys.has(39);   // RIGHT
+
+  if (hasInput) {
+    pauseAutoRotationTemporarily();
+
+    if (window.activeKeys.has(38)) totalRotationAngleXY += speed * 1; // UP
+    if (window.activeKeys.has(40)) totalRotationAngleXY -= speed * 1; // DOWN
+    if (window.activeKeys.has(37)) totalRotationAngleXZ -= speed * 1; // LEFT
+    if (window.activeKeys.has(39)) totalRotationAngleXZ += speed * 1; // RIGHT
+  }
+
+  
+
+  if(!window.isPaused && !autoRotationPaused){
+    totalRotationAngleXY += speed * 0.3;
+    totalRotationAngleXZ += speed * 0.3;
+  }
   
   // Normalize angles to prevent numeric overflow
   function normalizeAngle(angle) {
@@ -164,7 +215,7 @@ function drawFrame(currentTime) {
   const transform = headingTransform.multiply(pitchTransform);
  
   // Render based on wireframe toggle
-  if (wireframe_tog) {
+  if (!wireframe_tog) {
     ctx.save();
     ctx.translate(canvas.width / 2, canvas.height / 2);
     ctx.strokeStyle = "white";

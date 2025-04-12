@@ -4,6 +4,8 @@
   // State for toggle keys to track when a key is held down
   const toggleKeysDown = {};
 
+  window.isPaused = false;
+
   // Emit custom controlInput event with provided details.
   // The 'active' property indicates toggle status: true means on, false means off.
   function emitControlInput({ direction = null, key = null, active = true }) {
@@ -81,6 +83,47 @@
 
   // -----------------------------------------------------------
   // Keyboard support
+
+  function updatePauseButton() {
+    const $btn = $(".pause-toggle");
+    const $icon = $btn.find("ion-icon");
+
+    if (window.isPaused) {
+      $btn.addClass("green").removeClass("red");
+      $icon.attr("name", "play");
+    } else {
+      $btn.addClass("red").removeClass("green");
+      $icon.attr("name", "pause");
+    }
+  }
+
+  // Pointer click handler
+  $(".pause-toggle").on("pointerup", function (e) {
+    e.preventDefault();
+
+    window.isPaused = !window.isPaused;
+    emitControlInput({
+      key: "PAUSE",
+      active: window.isPaused,
+    });
+
+    updatePauseButton();
+  });
+
+  // Spacebar keyboard handler
+  $(document).on("keydown", function (e) {
+    if (e.code === "Space") {
+      e.preventDefault(); // Prevent page scrolling
+      window.isPaused = !window.isPaused;
+      emitControlInput({
+        key: "PAUSE",
+        active: window.isPaused,
+      });
+      updatePauseButton();
+    }
+  });
+
+  // Keyboard support
   $(document)
     .on("keydown", function (e) {
       const keyCode = e.which;
@@ -92,80 +135,51 @@
           switch (keyCode) {
             case 37:
               emitControlInput({ direction: "LEFT", active: true });
+              $(".left")
+                .addClass("pressed")
+                .css("transform", "translate(0, 2px)");
+              $(".lefttext").text("LEFT");
               break;
             case 38:
               emitControlInput({ direction: "UP", active: true });
+              $(".up")
+                .addClass("pressed")
+                .css("transform", "translate(0, 2px)");
+              $(".uptext").text("UP");
               break;
             case 39:
               emitControlInput({ direction: "RIGHT", active: true });
+              $(".right")
+                .addClass("pressed")
+                .css("transform", "translate(0, 2px)");
+              $(".righttext").text("RIGHT");
               break;
             case 40:
               emitControlInput({ direction: "DOWN", active: true });
+              $(".down")
+                .addClass("pressed")
+                .css("transform", "translate(0, 2px)");
+              $(".downtext").text("DOWN");
               break;
             case 65:
               emitControlInput({ key: "A", active: true });
+              $(".a").text("A");
               break;
             case 66:
               emitControlInput({ key: "B", active: true });
+              $(".b").text("B");
               break;
           }
-        }
-        // Visual feedback for momentary keys
-        switch (keyCode) {
-          case 37:
-            $(".left")
-              .addClass("pressed")
-              .css("transform", "translate(0, 2px)");
-            $(".lefttext").text("LEFT");
-            break;
-          case 38:
-            $(".up").addClass("pressed").css("transform", "translate(0, 2px)");
-            $(".uptext").text("UP");
-            break;
-          case 39:
-            $(".right")
-              .addClass("pressed")
-              .css("transform", "translate(0, 2px)");
-            $(".righttext").text("RIGHT");
-            break;
-          case 40:
-            $(".down")
-              .addClass("pressed")
-              .css("transform", "translate(0, 2px)");
-            $(".downtext").text("DOWN");
-            break;
-          case 65:
-            $(".a").text("A");
-            break;
-          case 66:
-            $(".b").text("B");
-            break;
         }
       }
-      // Handle toggle keys (Q, F, C) via keyboard.
-      else if ([81, 70, 67].includes(keyCode)) {
-        // Prevent default to capture key (such as F) properly.
-        e.preventDefault();
-        // Use our own toggleKey state to prevent repeated toggles while held down.
-        if (!toggleKeysDown[keyCode]) {
-          toggleKeysDown[keyCode] = true; // mark key as down
 
-          let selector, keyChar;
-          switch (keyCode) {
-            case 81:
-              selector = ".shape-btn";
-              keyChar = "Q";
-              break;
-            case 70:
-              selector = ".wireframe-btn";
-              keyChar = "F";
-              break;
-            case 67:
-              selector = ".color-btn";
-              keyChar = "C";
-              break;
-          }
-          // Toggle the button state: if not active, activate; if active, deactivate.
+      // Handle F as toggle
+      else if (keyCode === 70) {
+        e.preventDefault();
+        if (!toggleKeysDown[keyCode]) {
+          toggleKeysDown[keyCode] = true;
+          const selector = ".wireframe-btn";
+          const keyChar = "F";
           if (!$(selector).hasClass("active")) {
             $(selector).addClass("active");
             emitControlInput({ key: keyChar, active: true });
@@ -175,10 +189,30 @@
           }
         }
       }
+
+      // Handle Q and C as momentary keys
+      else if ([81, 67].includes(keyCode)) {
+        e.preventDefault();
+        if (!window.activeKeys.has(keyCode)) {
+          window.activeKeys.add(keyCode);
+          let selector, keyChar;
+          if (keyCode === 81) {
+            selector = ".shape-btn";
+            keyChar = "Q";
+          } else if (keyCode === 67) {
+            selector = ".color-btn";
+            keyChar = "C";
+          }
+          // $(selector).addClass("pressed").css("transform", "translate(0, 2px)");
+          $(selector).addClass("active");
+          emitControlInput({ key: keyChar, active: true });
+        }
+      }
     })
     .on("keyup", function (e) {
       const keyCode = e.which;
-      // For momentary keys: remove key from active set and clear visual feedback.
+
+      // Momentary keys release
       if ([37, 38, 39, 40, 65, 66].includes(keyCode)) {
         window.activeKeys.delete(keyCode);
         switch (keyCode) {
@@ -218,9 +252,25 @@
             break;
         }
       }
-      // Clear toggle key state on keyup so subsequent keydowns will register
-      if ([81, 70, 67].includes(keyCode)) {
+
+      // Clear toggle key state for F
+      if (keyCode === 70) {
         toggleKeysDown[keyCode] = false;
+      }
+
+      // Q and C key release (momentary)
+      if ([81, 67].includes(keyCode)) {
+        window.activeKeys.delete(keyCode);
+        let selector, keyChar;
+        if (keyCode === 81) {
+          selector = ".shape-btn";
+          keyChar = "Q";
+        } else if (keyCode === 67) {
+          selector = ".color-btn";
+          keyChar = "C";
+        }
+        $(selector).removeClass("active");
+        emitControlInput({ key: keyChar, active: false });
       }
     });
 })();
