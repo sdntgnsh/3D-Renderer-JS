@@ -217,7 +217,7 @@ canvas {
   .cc {
     border: 1px solid var(--main-color);
     /* margin: auto; */
-    height: 63vh;
+    height: 69vh;
     width: 92svw;
     transform: skew(deg);
     background-color: var(--canvas);
