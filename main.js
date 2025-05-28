@@ -11,12 +11,17 @@ let ct = 0;
 window.totalRotationAngleXZ = 0.0;
 window.totalRotationAngleXY = 0.0;
 const speed = 2;
+window.colorcount = 0;
 
 
 let wireframe_tog = true;
 let canToggleWireframe = true;
+let canChangeShape = true;
+let canChangecolor = true;
 
-const wireframeCooldown = 200; // milliseconds
+const cooldown_time_btn_wireframe = 50; // milliseconds
+const cooldown_time_btn_shape = 200;
+const cooldown_time_btn_color = 50;
 
 function toggleWireframe() {
   if (!canToggleWireframe) return;
@@ -27,7 +32,57 @@ function toggleWireframe() {
   // Re-enable toggling after cooldown
   setTimeout(() => {
     canToggleWireframe = true;
-  }, wireframeCooldown);
+  }, cooldown_time_btn_wireframe);
+}
+
+
+const SHAPE_GENERATORS = [
+  "createCubeCoords",
+  "createTetrahedronCoords",
+  "createSphereCoords",
+  "createIcosahedronCoords",
+  "createMobiusStripCoords",
+  "createTorusCoords",
+];
+
+function getShapeCoordsByIndex(index, size = 150) {
+  const shapeKey = SHAPE_GENERATORS[index % SHAPE_GENERATORS.length];
+  const methodName = shapeKey;
+  
+  if (typeof CoordinateCreator[methodName] === "function") {
+    return CoordinateCreator[methodName](size);
+  } else {
+    throw new Error(`Shape function '${methodName}' is not defined.`);
+  }
+}
+
+function changeShape() {
+  if (!canChangeShape) return;
+
+  window.shapecount++;
+  console.log(window.shapecount);
+  canChangeShape = false;
+
+  // Re-enable toggling after cooldown
+  setTimeout(() => {
+    canChangeShape = true;
+  }, cooldown_time_btn_shape);
+  // window.shapecount/= 2;
+}
+
+
+function changeColor() {
+  if (!canChangecolor) return;
+
+  window.colorcount++;
+  console.log(window.colorcount);
+  canChangecolor = false;
+
+  // Re-enable toggling after cooldown
+  setTimeout(() => {
+    canChangecolor = true;
+  }, cooldown_time_btn_color);
+  // window.shapecount/= 2;
 }
 // === Input Event Listener from controls.js ===
 document.addEventListener("controlInput", (e) => {
@@ -60,13 +115,21 @@ document.addEventListener("controlInput", (e) => {
       break;
 
     case "Q":
-      console.log("Shape mode triggered");
+      if (e.detail?.active) {
+        changeShape();
+        console.log("Shape mode triggered");
+      }
       break;
     case "F":
       // console.log("Wireframe mode toggled");
       toggleWireframe();
       break;
     case "C":
+
+      if (e.detail?.active) {
+        changeColor();
+        console.log("Color change triggered");
+      }
       // console.log("Color change triggered");
       break;
     case "CUBE":
@@ -103,19 +166,21 @@ let autoRotationPaused = false;
 let autoRotationTimeout;
 
 function pauseAutoRotationTemporarily(delay = 1000) {
-  window.isPaused = true;
-  console.log("Auto-rotation paused");
-  autoRotationPaused = true;
+  if(window.isPaused == false){
+      window.isPaused = true;
+      console.log("Auto-rotation paused");
+      autoRotationPaused = true;
 
-  if (autoRotationTimeout) {
-    clearTimeout(autoRotationTimeout);
+      if (autoRotationTimeout) {
+        clearTimeout(autoRotationTimeout);
+      }
+
+      autoRotationTimeout = setTimeout(() => {
+        autoRotationPaused = false;
+        window.isPaused = false; // ← move it here
+        console.log("Auto-rotation resumed");
+      }, delay);
   }
-
-  autoRotationTimeout = setTimeout(() => {
-    autoRotationPaused = false;
-    window.isPaused = false; // ← move it here
-    console.log("Auto-rotation resumed");
-  }, delay);
 }
 
 
@@ -177,22 +242,48 @@ function drawFrame(currentTime) {
     totalRotationAngleXZ = normalizeAngle(totalRotationAngleXZ);
   
   // Generate fresh cube coordinates each frame
-  const Shape_Coords = CoordinateCreator.createCubeCoords(150);
+  let Shape_Coords = getShapeCoordsByIndex(window.shapecount , 150);
+  // if(window.shapecount%2 == 0){
+  //    Shape_Coords = CoordinateCreator.createCubeCoords(150);
+  // }
+  // else{
+  //    Shape_Coords = CoordinateCreator.createOctahedronCoords(150);
+  // }
   const color_list = [
-    new Color(255, 0, 0),     // Red
-    new Color(0, 255, 0),     // Green
-    new Color(0, 0, 255),     // Blue
-    new Color(255, 255, 0),   // Yellow
-    new Color(255, 0, 255),   // Magenta
-    new Color(0, 255, 255),   // Cyan
-    new Color(255, 255, 255), // White
+    [new Color(247, 37, 133),  
+      new Color(181, 23, 158),  
+      new Color(114, 9, 183),   
+      new Color(58, 12, 163),   
+      new Color(67, 97, 238),   
+      new Color(76, 201, 240)],
+      [new Color(228, 3, 3),     // Bright Red
+        new Color(255, 140, 0),   // Orange
+        new Color(255, 237, 0),   // Yellow
+        new Color(0, 128, 38),    // Green
+        new Color(0, 77, 255),    // Blue
+        new Color(117, 7, 135)],
+      [new Color(240, 243, 250)], // 
+      [
+        new Color(247, 181, 56),
+        new Color(219, 124, 38),
+        new Color(216, 87, 42),
+        new Color(195, 47, 39),
+        new Color(152, 30, 29),
+        new Color(120, 1, 22)
+      ],
+      [ new Color(235, 195, 190),
+        new Color(222, 95, 85),
+        new Color(255, 255, 234),
+        new Color(106, 153, 78),
+        new Color(66, 106, 90),
+        new Color(37, 48, 49)],
+
   ];
-  
   // Create a fresh polygon list each frame (important!)
   let poly_list = [];
   for (let i = 0; i < Shape_Coords.length; i++) {
     poly_list.push(
-      new Polygon(Shape_Coords[i], color_list[i % color_list.length])
+      new Polygon(Shape_Coords[i], color_list[window.colorcount % color_list.length][i % color_list[window.colorcount % color_list.length].length])
     );
   }
   

@@ -1,6 +1,8 @@
-(function () {
-  // Global active keys set for momentary keys (arrow keys, A, B)
+(() => {
+  // Global active keys set for momentary keys (arrow keys, A, B, Q, C)
   window.activeKeys = new Set();
+
+  window.shapecount = 0;
   // State for toggle keys to track when a key is held down
   const toggleKeysDown = {};
 
@@ -53,6 +55,11 @@
   addPointerKeyHandlers(".left", 37, "left");
   addPointerKeyHandlers(".right", 39, "right");
 
+  // Bind toggle control buttons: Q, F, and C
+  bindToggleButton(".shape-btn", 81, "Q");
+  bindToggleButton(".wireframe-btn", 70, "F");
+  bindToggleButton(".color-btn", 67, "C");
+
   // -----------------------------------------------------------
   // Toggle buttons for control keys (Q, F, C) via pointer.
   function bindToggleButton(selector, keyCode, keyChar) {
@@ -65,14 +72,10 @@
       } else {
         $(this).addClass("active");
         emitControlInput({ key: keyChar, active: true });
+        $(this).removeClass("active");
       }
     });
   }
-
-  // Bind toggle control buttons: Q, F, and C
-  bindToggleButton(".shape-btn", 81, "Q");
-  bindToggleButton(".wireframe-btn", 70, "F");
-  bindToggleButton(".color-btn", 67, "C");
 
   // -----------------------------------------------------------
   // Shape selector dropdown change
@@ -172,7 +175,23 @@
           }
         }
       }
-
+      // Handle Q and C as momentary keys (fixed for hold)
+      else if ([81, 67].includes(keyCode)) {
+        e.preventDefault();
+        if (!window.activeKeys.has(keyCode)) {
+          window.activeKeys.add(keyCode);
+          let selector, keyChar;
+          if (keyCode === 81) {
+            selector = ".shape-btn";
+            keyChar = "Q";
+          } else if (keyCode === 67) {
+            selector = ".color-btn";
+            keyChar = "C";
+          }
+          $(selector).addClass("active");
+          emitControlInput({ key: keyChar, active: true });
+        }
+      }
       // Handle F as toggle
       else if (keyCode === 70) {
         e.preventDefault();
@@ -187,25 +206,6 @@
             $(selector).removeClass("active");
             emitControlInput({ key: keyChar, active: false });
           }
-        }
-      }
-
-      // Handle Q and C as momentary keys
-      else if ([81, 67].includes(keyCode)) {
-        e.preventDefault();
-        if (!window.activeKeys.has(keyCode)) {
-          window.activeKeys.add(keyCode);
-          let selector, keyChar;
-          if (keyCode === 81) {
-            selector = ".shape-btn";
-            keyChar = "Q";
-          } else if (keyCode === 67) {
-            selector = ".color-btn";
-            keyChar = "C";
-          }
-          // $(selector).addClass("pressed").css("transform", "translate(0, 2px)");
-          $(selector).addClass("active");
-          emitControlInput({ key: keyChar, active: true });
         }
       }
     })
