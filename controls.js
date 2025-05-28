@@ -57,7 +57,7 @@
 
   // Bind toggle control buttons: Q, F, and C
   bindToggleButton(".shape-btn", 81, "Q");
-  bindToggleButton(".wireframe-btn", 70, "F");
+  bindToggleButtonWireframe(".wireframe-btn", 70, "F");
   bindToggleButton(".color-btn", 67, "C");
 
   // -----------------------------------------------------------
@@ -73,6 +73,21 @@
         $(this).addClass("active");
         emitControlInput({ key: keyChar, active: true });
         $(this).removeClass("active");
+      }
+    });
+  }
+
+  function bindToggleButtonWireframe(selector, keyCode, keyChar) {
+    $(selector).on("pointerup", function (e) {
+      e.preventDefault();
+      // Toggle the button state
+      if ($(this).hasClass("active")) {
+        $(this).removeClass("active");
+        emitControlInput({ key: keyChar, active: false });
+      } else {
+        $(this).addClass("active");
+        emitControlInput({ key: keyChar, active: true });
+        // $(this).removeClass("active");
       }
     });
   }
