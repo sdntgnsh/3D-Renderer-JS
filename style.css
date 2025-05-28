@@ -47,6 +47,7 @@ body {
   display: flex;
   flex-direction: row;
   align-items: right;
+  margin-bottom: 0;
 }
 
 .social-icons-btn {
@@ -298,6 +299,10 @@ button,
 /* arrows */
 
 .arrows-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   margin: auto;
   height: 350px;
   width: 350px;
@@ -305,21 +310,6 @@ button,
   min-width: 350px;
 }
 
-@media (max-width: 1500px) {
-  .arrows-container {
-    margin: auto;
-    height: 250px;
-    width: 250px;
-    min-height: 250px;
-    min-width: 250px;
-    justify-content: center;
-  }
-}
-
-.arrows-container {
-  display: inline-block;
-  align-items: center;
-}
 @import url(https://fonts.googleapis.com/css?family=Lato:300);
 
 @import url(https://fonts.googleapis.com/css?family=Lato:300);
@@ -371,16 +361,6 @@ html {
   gap: 10px;
 }
 
-/* .pause.arr {
-  background-color: #444;
-  font-size: 28px;
-}
-
-.blank.arr {
-  background-color: #222;
-  pointer-events: none;
-} */
-
 .up {
   position: relative;
   top: -4px;
@@ -420,27 +400,10 @@ html {
     margin: auto;
     height: 75px;
     width: 215px;
-    min-height: 200px;
+    min-height: 140px;
     min-width: 215px;
   }
 
-  /* @media (max-width: 1500px) {
-    .arrows-container {
-      margin: auto;
-      height: 200px;
-      width: 200px;
-      min-height: 200px;
-      min-width: 200px;
-      justify-content: center;
-    }
-  } */
-
-  .arrows-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
   @import url(https://fonts.googleapis.com/css?family=Lato:300);
 
   @import url(https://fonts.googleapis.com/css?family=Lato:300);
